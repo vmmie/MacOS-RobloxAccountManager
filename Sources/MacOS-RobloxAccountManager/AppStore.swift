@@ -15,6 +15,7 @@ final class AppStore: ObservableObject {
     @Published var showingAccountEditor = false
     @Published var editingAccount: AccountRecord?
     @Published var pendingSecret = AccountSecret(robloxSecurityCookie: "")
+    private var cleanupTimers: [pid_t: Timer] = [:]
 
     let storage: FileStorage
     let keychain: KeychainStore
@@ -126,6 +127,15 @@ final class AppStore: ObservableObject {
         }
     }
 
+    func cleanupMultiInstanceCopies() {
+        do {
+            try multiInstance.cleanupManagedCopies()
+            log("Cleaned multi-instance Roblox app copies.")
+        } catch {
+            report(error)
+        }
+    }
+
     func exportAccounts() {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.json]
@@ -202,11 +212,17 @@ final class AppStore: ObservableObject {
         if let applicationURL {
             let configuration = NSWorkspace.OpenConfiguration()
             configuration.activates = true
-            NSWorkspace.shared.open([url], withApplicationAt: applicationURL, configuration: configuration) { _, error in
+            NSWorkspace.shared.open([url], withApplicationAt: applicationURL, configuration: configuration) { runningApplication, error in
                 Task { @MainActor in
                     if let error {
                         self.report(ValidationError("macOS could not launch the Roblox app copy: \(error.localizedDescription)"))
+                        try? self.multiInstance.cleanupManagedCopy(at: applicationURL)
                         return
+                    }
+                    if let runningApplication {
+                        self.cleanupCopy(applicationURL, whenApplicationTerminates: runningApplication)
+                    } else {
+                        self.report(ValidationError("macOS launched the Roblox app copy but did not return a running application handle. The copy may need manual cleanup later."))
                     }
                     self.markUsed(account)
                     self.log("Opened Roblox app copy for \(account.username) at Place ID \(request.placeID).")
@@ -220,6 +236,28 @@ final class AppStore: ObservableObject {
         }
         markUsed(account)
         log("Opened Roblox for \(account.username) at Place ID \(request.placeID).")
+    }
+
+    private func cleanupCopy(_ applicationURL: URL, whenApplicationTerminates application: NSRunningApplication) {
+        let processIdentifier = application.processIdentifier
+        cleanupTimers[processIdentifier]?.invalidate()
+        cleanupTimers[processIdentifier] = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self, weak application] timer in
+            guard let self, let application else {
+                timer.invalidate()
+                return
+            }
+            guard application.isTerminated else { return }
+            timer.invalidate()
+            Task { @MainActor in
+                self.cleanupTimers[processIdentifier] = nil
+                do {
+                    try self.multiInstance.cleanupManagedCopy(at: applicationURL)
+                    self.log("Removed multi-instance Roblox app copy after Roblox closed.")
+                } catch {
+                    self.report(error)
+                }
+            }
+        }
     }
 
     private func markUsed(_ account: AccountRecord) {

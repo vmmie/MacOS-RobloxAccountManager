@@ -5,6 +5,8 @@
 - Added experimental native macOS multi-instance launch support.
 - Added a Swift `MultiInstanceService` that creates managed Roblox app copies and patches only those copies.
 - Added ad-hoc signing for managed Roblox app copies after plist patching.
+- Added automatic cleanup of managed Roblox app copies after the launched instance exits.
+- Added a Settings button to clean leftover multi-instance copies.
 - Added best-effort Roblox single-instance semaphore cleanup for multi-instance launches.
 - Enabled the multi-instance setting with an in-app warning.
 - Added README documentation and manual testing steps for multi-instance behavior.

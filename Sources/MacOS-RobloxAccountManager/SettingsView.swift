@@ -28,7 +28,7 @@ struct SettingsView: View {
                             .font(.caption)
                             .foregroundStyle(.orange)
                     }
-                    Text("Developer API is intentionally disabled. Multi-instance does not modify the installed Roblox app, but it does use temporary app copies and a best-effort macOS process-lock cleanup.")
+                    Text("Developer API is intentionally disabled. Multi-instance does not modify the installed Roblox app. Temporary app copies are removed after the launched Roblox instance closes.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -49,6 +49,12 @@ struct SettingsView: View {
                     store.backupAccounts()
                 } label: {
                     Label("Backup Metadata", systemImage: "externaldrive")
+                }
+
+                Button {
+                    store.cleanupMultiInstanceCopies()
+                } label: {
+                    Label("Clean Multi-Instance Copies", systemImage: "trash")
                 }
 
                 Spacer()

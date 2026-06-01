@@ -86,20 +86,20 @@ When multi-instance is off, Roblox launches normally through the system `roblox-
 When multi-instance is on, the app:
 
 1. Locates the installed Roblox app in `/Applications/Roblox.app` or `~/Applications/Roblox.app`.
-2. Creates a managed copy under `~/Library/Application Support/MacOS-RobloxAccountManager/MultiInstanceCopies/`.
+2. Creates a temporary managed copy under `~/Library/Application Support/MacOS-RobloxAccountManager/MultiInstanceCopies/`.
 3. Updates only the copied app bundle's `Info.plist` so macOS does not prohibit multiple instances of that copy.
 4. Ad-hoc signs the managed copy so macOS can launch the locally modified copy.
 5. Performs a best-effort cleanup of Roblox's macOS single-instance semaphore.
 6. Asks macOS to open the Roblox launch URL with the managed copy.
 
-This does not modify the installed Roblox app. It does not require `sudo`, does not install a background service, and does not add telemetry.
+This does not modify the installed Roblox app. It does not require `sudo`, does not install a background service, and does not add telemetry. The app removes each managed copy after the launched Roblox instance exits.
 
 Compatibility notes:
 
 - Roblox updates may change its process locking behavior and break this feature.
 - macOS Gatekeeper, Roblox updates, or a missing `/Applications/Roblox.app` can prevent a second instance from launching.
 - Multiple Roblox clients may still share some Roblox-managed local state. The app stores account metadata separately and keeps account tokens in Keychain.
-- The managed Roblox copies are local app bundles created by this app and may be removed by deleting the `MultiInstanceCopies` folder.
+- Managed Roblox copies are temporary local app bundles. If a copy remains after a crash or forced quit, use Settings -> `Clean Multi-Instance Copies` after closing Roblox.
 - If multi-instance launch fails, the app writes a clear error to the log and normal launching remains available after disabling the setting.
 
 The project [Insadem/multi-roblox-macos](https://github.com/Insadem/multi-roblox-macos) was reviewed only as a technical reference for possible macOS approaches. No code, source files, or Go components from that project are copied or vendored here.
@@ -162,7 +162,9 @@ The bundle is written to `dist/MacOS-RobloxAccountManager.app`.
 4. Launch a second account from the app.
 5. Disable `Multi-instance mode`.
 6. Confirm a normal launch still works.
-7. If a launch fails, confirm the app shows a clear log message and account data remains unchanged.
+7. Close Roblox and confirm the app removes the managed copy.
+8. If a launch fails, confirm the app shows a clear log message and account data remains unchanged.
+9. Use Settings -> `Clean Multi-Instance Copies` to remove any leftover copies after Roblox is closed.
 
 ## Original Project
 

@@ -61,16 +61,16 @@ public struct MultiInstanceService {
         self.codeSignPreparedCopies = codeSignPreparedCopies
     }
 
-    public func prepareRobloxApplicationCopy(accountID: UUID) throws -> MultiInstancePreparation {
+    public func prepareRobloxApplicationCopy(accountID: UUID, launchID: UUID = UUID()) throws -> MultiInstancePreparation {
         let source = try findRobloxApplication()
         try FileManager.default.createDirectory(at: rootDirectory, withIntermediateDirectories: true)
 
-        let copyURL = rootDirectory.appendingPathComponent("Roblox-\(accountID.uuidString).app", isDirectory: true)
+        let copyURL = rootDirectory.appendingPathComponent("Roblox-\(launchID.uuidString).app", isDirectory: true)
         if FileManager.default.fileExists(atPath: copyURL.path) {
             try FileManager.default.removeItem(at: copyURL)
         }
         try FileManager.default.copyItem(at: source, to: copyURL)
-        try configureCopyInfoPlist(at: copyURL, accountID: accountID)
+        try configureCopyInfoPlist(at: copyURL, accountID: accountID, launchID: launchID)
         if codeSignPreparedCopies {
             try adHocSignApplicationCopy(at: copyURL)
         }
@@ -86,6 +86,14 @@ public struct MultiInstanceService {
         try FileManager.default.removeItem(at: rootDirectory)
     }
 
+    public func cleanupManagedCopy(at applicationURL: URL) throws {
+        let standardizedRoot = rootDirectory.standardizedFileURL.path
+        let standardizedCopy = applicationURL.standardizedFileURL.path
+        guard standardizedCopy.hasPrefix(standardizedRoot) else { return }
+        guard FileManager.default.fileExists(atPath: applicationURL.path) else { return }
+        try FileManager.default.removeItem(at: applicationURL)
+    }
+
     public func findRobloxApplication() throws -> URL {
         for candidate in robloxSourceCandidates where FileManager.default.fileExists(atPath: candidate.path) {
             return candidate
@@ -98,7 +106,7 @@ public struct MultiInstanceService {
         return result == 0 || errno == ENOENT
     }
 
-    private func configureCopyInfoPlist(at appURL: URL, accountID: UUID) throws {
+    private func configureCopyInfoPlist(at appURL: URL, accountID: UUID, launchID: UUID) throws {
         let infoPlistURL = appURL
             .appendingPathComponent("Contents", isDirectory: true)
             .appendingPathComponent("Info.plist")
@@ -116,9 +124,10 @@ public struct MultiInstanceService {
             throw MultiInstanceError.invalidInfoPlist(infoPlistURL.path)
         }
 
-        let identifier = accountID.uuidString.replacingOccurrences(of: "-", with: "").lowercased()
-        plist["CFBundleIdentifier"] = "com.github.vmmie.MacOS-RobloxAccountManager.roblox.\(identifier)"
-        plist["CFBundleName"] = "Roblox \(String(identifier.prefix(8)))"
+        let accountIdentifier = accountID.uuidString.replacingOccurrences(of: "-", with: "").lowercased()
+        let launchIdentifier = launchID.uuidString.replacingOccurrences(of: "-", with: "").lowercased()
+        plist["CFBundleIdentifier"] = "com.github.vmmie.MacOS-RobloxAccountManager.roblox.\(accountIdentifier).\(launchIdentifier)"
+        plist["CFBundleName"] = "Roblox \(String(launchIdentifier.prefix(8)))"
         plist["LSMultipleInstancesProhibited"] = false
 
         let output = try PropertyListSerialization.data(fromPropertyList: plist, format: format, options: 0)
