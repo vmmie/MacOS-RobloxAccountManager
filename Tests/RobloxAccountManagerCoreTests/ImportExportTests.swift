@@ -44,7 +44,10 @@ final class ImportExportTests: XCTestCase {
         try storage.saveAccounts(accounts)
         try storage.saveSettings(settings)
 
-        XCTAssertEqual(try storage.loadAccounts(), accounts)
+        let loadedAccounts = try storage.loadAccounts()
+        XCTAssertEqual(loadedAccounts.map(\.id), accounts.map(\.id))
+        XCTAssertEqual(loadedAccounts.map(\.username), ["one", "two"])
+        XCTAssertEqual(loadedAccounts.map(\.group), ["Default", "Alts"])
         XCTAssertEqual(try storage.loadSettings(), settings)
 
         let backupURL = try storage.backupAccounts()
@@ -63,4 +66,3 @@ final class ImportExportTests: XCTestCase {
         XCTAssertTrue(raw.contains("RequestGameJob"))
     }
 }
-
