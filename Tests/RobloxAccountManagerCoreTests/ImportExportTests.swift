@@ -4,7 +4,7 @@ import XCTest
 
 final class ImportExportTests: XCTestCase {
     func testMetadataExportDoesNotIncludeSecrets() throws {
-        let account = AccountRecord(username: "exampleUser", alias: "Main", group: "Primary", savedPlaceID: "1818")
+        let account = AccountRecord(username: "exampleUser", group: "Primary", savedPlaceID: "1818")
         let envelope = ImportExportService().makeExport(accounts: [account])
 
         XCTAssertFalse(envelope.includesSensitiveSecrets)
