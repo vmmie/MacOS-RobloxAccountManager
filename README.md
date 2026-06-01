@@ -46,6 +46,7 @@ The original Windows project is a WinForms/.NET Framework application. Important
 - Settings view with normal launch toggles and advanced toggles separated out.
 - Logs with visible error messages.
 - Roblox launch support using Roblox authentication ticket flow and `roblox-player:` URL handler.
+- Experimental native macOS multi-instance launching through managed Roblox app copies.
 - Tests for storage, import/export, and launch URL construction.
 - GitHub Actions workflow for Swift build/test.
 
@@ -75,6 +76,33 @@ Only use this tool with accounts you own. Never share tokens, exported files con
 The `Allow account launching` and `Allow roblox-player launch URLs` options are normal launch settings. They are disabled by default because launch links depend on Roblox session state, but they are not hidden behind a special risk mode.
 
 The app launches Roblox by requesting an authentication ticket for the selected account, building a `roblox-player:` URL, and handing it off to macOS.
+
+## Multi-Instance
+
+Multi-instance is an experimental advanced setting and is disabled by default.
+
+When multi-instance is off, Roblox launches normally through the system `roblox-player:` URL handler.
+
+When multi-instance is on, the app:
+
+1. Locates the installed Roblox app in `/Applications/Roblox.app` or `~/Applications/Roblox.app`.
+2. Creates a managed copy under `~/Library/Application Support/MacOS-RobloxAccountManager/MultiInstanceCopies/`.
+3. Updates only the copied app bundle's `Info.plist` so macOS does not prohibit multiple instances of that copy.
+4. Ad-hoc signs the managed copy so macOS can launch the locally modified copy.
+5. Performs a best-effort cleanup of Roblox's macOS single-instance semaphore.
+6. Asks macOS to open the Roblox launch URL with the managed copy.
+
+This does not modify the installed Roblox app. It does not require `sudo`, does not install a background service, and does not add telemetry.
+
+Compatibility notes:
+
+- Roblox updates may change its process locking behavior and break this feature.
+- macOS Gatekeeper, Roblox updates, or a missing `/Applications/Roblox.app` can prevent a second instance from launching.
+- Multiple Roblox clients may still share some Roblox-managed local state. The app stores account metadata separately and keeps account tokens in Keychain.
+- The managed Roblox copies are local app bundles created by this app and may be removed by deleting the `MultiInstanceCopies` folder.
+- If multi-instance launch fails, the app writes a clear error to the log and normal launching remains available after disabling the setting.
+
+The project [Insadem/multi-roblox-macos](https://github.com/Insadem/multi-roblox-macos) was reviewed only as a technical reference for possible macOS approaches. No code, source files, or Go components from that project are copied or vendored here.
 
 ## Installation
 
@@ -121,10 +149,20 @@ The bundle is written to `dist/MacOS-RobloxAccountManager.app`.
 - No Developer API server yet.
 - No account-control websocket/Nexus port.
 - No server browser, universe/outfit utilities, account utilities, Roblox watcher, browser automation, or FPS unlocker.
-- No macOS multi-instance implementation in `v0.2.0`.
+- Multi-instance is experimental and may break with Roblox or macOS updates.
 - Import/export intentionally excludes tokens and passwords.
 - Roblox launch depends on the installed Roblox macOS URL handler and a valid account token.
 - Release artifacts are ad-hoc signed but not notarized unless a signing identity is configured externally.
+
+## Manual Testing
+
+1. Launch Roblox normally with multi-instance disabled.
+2. Open Settings and enable `Multi-instance mode`.
+3. Launch the first account from the app.
+4. Launch a second account from the app.
+5. Disable `Multi-instance mode`.
+6. Confirm a normal launch still works.
+7. If a launch fails, confirm the app shows a clear log message and account data remains unchanged.
 
 ## Original Project
 

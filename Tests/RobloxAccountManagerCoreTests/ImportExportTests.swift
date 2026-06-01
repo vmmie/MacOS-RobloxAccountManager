@@ -65,4 +65,43 @@ final class ImportExportTests: XCTestCase {
         XCTAssertTrue(raw.contains("browsertrackerid:123456"))
         XCTAssertTrue(raw.contains("RequestGameJob"))
     }
+
+    func testMultiInstanceServicePreparesManagedRobloxCopy() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let source = root.appendingPathComponent("SourceRoblox.app", isDirectory: true)
+        let contents = source.appendingPathComponent("Contents", isDirectory: true)
+        try FileManager.default.createDirectory(at: contents, withIntermediateDirectories: true)
+        let infoPlistURL = contents.appendingPathComponent("Info.plist")
+        let plist: [String: Any] = [
+            "CFBundleIdentifier": "com.roblox.RobloxPlayer",
+            "CFBundleName": "Roblox",
+            "LSMultipleInstancesProhibited": true
+        ]
+        let plistData = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
+        try plistData.write(to: infoPlistURL)
+
+        let service = try MultiInstanceService(
+            rootDirectory: root.appendingPathComponent("Copies", isDirectory: true),
+            robloxSourceCandidates: [source],
+            codeSignPreparedCopies: false
+        )
+        let accountID = UUID()
+        let preparation = try service.prepareRobloxApplicationCopy(accountID: accountID)
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: preparation.applicationURL.path))
+        let copiedInfoPlistURL = preparation.applicationURL
+            .appendingPathComponent("Contents", isDirectory: true)
+            .appendingPathComponent("Info.plist")
+        let copiedData = try Data(contentsOf: copiedInfoPlistURL)
+        var format = PropertyListSerialization.PropertyListFormat.xml
+        let copiedPlist = try XCTUnwrap(PropertyListSerialization.propertyList(
+            from: copiedData,
+            options: [],
+            format: &format
+        ) as? [String: Any])
+        XCTAssertEqual(copiedPlist["LSMultipleInstancesProhibited"] as? Bool, false)
+        XCTAssertNotEqual(copiedPlist["CFBundleIdentifier"] as? String, "com.roblox.RobloxPlayer")
+    }
 }

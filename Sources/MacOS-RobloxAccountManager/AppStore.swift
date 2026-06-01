@@ -20,11 +20,13 @@ final class AppStore: ObservableObject {
     let keychain: KeychainStore
     let importer = ImportExportService()
     let launcher = RobloxLaunchService()
+    let multiInstance: MultiInstanceService
 
     init() {
         do {
             storage = try FileStorage()
             keychain = KeychainStore()
+            multiInstance = try MultiInstanceService()
             accounts = try storage.loadAccounts()
             settings = try storage.loadSettings()
             selectedAccountID = accounts.first?.id
@@ -175,13 +177,49 @@ final class AppStore: ObservableObject {
                 log("Requesting Roblox authentication ticket for \(account.username).")
                 let ticket = try await launcher.fetchAuthenticationTicket(cookie: secret.robloxSecurityCookie)
                 let url = try launcher.buildLaunchURL(ticket: ticket, request: request)
-                NSWorkspace.shared.open(url)
-                markUsed(account)
-                log("Opened Roblox for \(account.username) at Place ID \(request.placeID).")
+                if settings.allowMultiInstance {
+                    log("Preparing multi-instance Roblox app copy for \(account.username).")
+                    let preparation = try multiInstance.prepareRobloxApplicationCopy(accountID: account.id)
+                    if !preparation.singletonSemaphoreReleased {
+                        log("Multi-instance warning: Roblox single-instance semaphore could not be released. Launch may still fail.")
+                    }
+                    try openRoblox(url, account: account, request: request, applicationURL: preparation.applicationURL)
+                } else {
+                    try openRoblox(url, account: account, request: request)
+                }
             } catch {
                 report(error)
             }
         }
+    }
+
+    private func openRoblox(
+        _ url: URL,
+        account: AccountRecord,
+        request: RobloxLaunchRequest,
+        applicationURL: URL? = nil
+    ) throws {
+        if let applicationURL {
+            let configuration = NSWorkspace.OpenConfiguration()
+            configuration.activates = true
+            NSWorkspace.shared.open([url], withApplicationAt: applicationURL, configuration: configuration) { _, error in
+                Task { @MainActor in
+                    if let error {
+                        self.report(ValidationError("macOS could not launch the Roblox app copy: \(error.localizedDescription)"))
+                        return
+                    }
+                    self.markUsed(account)
+                    self.log("Opened Roblox app copy for \(account.username) at Place ID \(request.placeID).")
+                }
+            }
+            return
+        }
+
+        guard NSWorkspace.shared.open(url) else {
+            throw ValidationError("macOS did not accept the Roblox launch URL. Reinstall Roblox or check the roblox-player URL handler.")
+        }
+        markUsed(account)
+        log("Opened Roblox for \(account.username) at Place ID \(request.placeID).")
     }
 
     private func markUsed(_ account: AccountRecord) {

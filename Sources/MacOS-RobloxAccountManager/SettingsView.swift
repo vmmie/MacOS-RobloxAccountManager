@@ -23,8 +23,12 @@ struct SettingsView: View {
                         .disabled(true)
 
                     Toggle("Multi-instance mode", isOn: $store.settings.allowMultiInstance)
-                        .disabled(true)
-                    Text("Developer API and multi-instance mode are intentionally disabled in v0.2.0. The Windows port uses local web server/websocket code and a Windows named mutex; this macOS port does not ship a replacement.")
+                    if store.settings.allowMultiInstance {
+                        Text("Multi-instance is experimental. It launches through managed Roblox app copies and may break when Roblox updates.")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
+                    Text("Developer API is intentionally disabled. Multi-instance does not modify the installed Roblox app, but it does use temporary app copies and a best-effort macOS process-lock cleanup.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

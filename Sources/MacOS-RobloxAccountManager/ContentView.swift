@@ -213,6 +213,9 @@ struct StatusBar: View {
             if !store.settings.allowDeveloperAPI {
                 Label("Developer API off", systemImage: "network.slash")
             }
+            if store.settings.allowMultiInstance {
+                Label("Multi-instance on", systemImage: "rectangle.stack")
+            }
         }
         .font(.caption)
         .foregroundStyle(.secondary)

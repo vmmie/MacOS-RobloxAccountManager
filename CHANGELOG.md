@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Added experimental native macOS multi-instance launch support.
+- Added a Swift `MultiInstanceService` that creates managed Roblox app copies and patches only those copies.
+- Added ad-hoc signing for managed Roblox app copies after plist patching.
+- Added best-effort Roblox single-instance semaphore cleanup for multi-instance launches.
+- Enabled the multi-instance setting with an in-app warning.
+- Added README documentation and manual testing steps for multi-instance behavior.
+- Added tests for managed Roblox app copy preparation.
+
 ## v0.2.0 - Launch Flow Cleanup
 
 - Removed `Alias` and `User ID` fields from the macOS app.
