@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.3.0 - Experimental Multi-Instance
 
 - Added experimental native macOS multi-instance launch support.
 - Added a Swift `MultiInstanceService` that creates managed Roblox app copies and patches only those copies.

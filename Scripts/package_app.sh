@@ -41,9 +41,9 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
-  <string>0.2.0</string>
+  <string>0.3.0</string>
   <key>CFBundleVersion</key>
-  <string>2</string>
+  <string>3</string>
   <key>LSMinimumSystemVersion</key>
   <string>14.0</string>
   <key>NSHighResolutionCapable</key>
@@ -56,5 +56,5 @@ chmod +x "$APP/Contents/MacOS/$APP_NAME"
 xattr -cr "$APP" 2>/dev/null || true
 codesign --force --deep --sign - "$APP"
 codesign --verify --deep --strict --verbose=2 "$APP"
-ditto -c -k --keepParent "$APP" "$DIST/$APP_NAME-v0.2.0-macos.zip"
+ditto -c -k --keepParent "$APP" "$DIST/$APP_NAME-v0.3.0-macos.zip"
 echo "$APP"
