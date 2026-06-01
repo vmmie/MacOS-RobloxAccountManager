@@ -5,10 +5,20 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_NAME="MacOS-RobloxAccountManager"
 DIST="$ROOT/dist"
 APP="$DIST/$APP_NAME.app"
-EXECUTABLE="$ROOT/.build/release/$APP_NAME"
 
 cd "$ROOT"
-swift build -c release
+
+if swift build -c release --triple arm64-apple-macosx14.0 && swift build -c release --triple x86_64-apple-macosx14.0; then
+  EXECUTABLE="$DIST/$APP_NAME-universal"
+  lipo -create \
+    "$ROOT/.build/arm64-apple-macosx/release/$APP_NAME" \
+    "$ROOT/.build/x86_64-apple-macosx/release/$APP_NAME" \
+    -output "$EXECUTABLE"
+else
+  echo "Universal build failed; falling back to host architecture." >&2
+  swift build -c release
+  EXECUTABLE="$ROOT/.build/release/$APP_NAME"
+fi
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
@@ -43,5 +53,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 PLIST
 
 chmod +x "$APP/Contents/MacOS/$APP_NAME"
+xattr -cr "$APP" 2>/dev/null || true
+codesign --force --deep --sign - "$APP"
+codesign --verify --deep --strict --verbose=2 "$APP"
 ditto -c -k --keepParent "$APP" "$DIST/$APP_NAME-v0.1.0-macos.zip"
 echo "$APP"

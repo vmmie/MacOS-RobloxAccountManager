@@ -71,9 +71,9 @@ Developer/API functionality is disabled and not implemented in v0.1.0. The upstr
 
 ## Installation
 
-Download the v0.1.0 release asset if available, unzip it, and run `MacOS-RobloxAccountManager.app`.
+Download the v0.1.0 release asset if available, unzip it, and run `MacOS-RobloxAccountManager.app`. The release zip contains a universal `arm64` + `x86_64` app bundle.
 
-If macOS blocks the unsigned app, build from source or explicitly allow the app in System Settings. v0.1.0 release builds are unsigned unless stated otherwise.
+If macOS blocks the app, build from source or explicitly allow the app in System Settings. v0.1.0 release builds are ad-hoc signed but not notarized with an Apple Developer ID.
 
 ## Build Instructions
 
@@ -117,7 +117,7 @@ The bundle is written to `dist/MacOS-RobloxAccountManager.app`.
 - No macOS multi-instance implementation in v0.1.0.
 - Import/export intentionally excludes cookies and passwords.
 - Roblox launch depends on the installed Roblox macOS URL handler and a valid account cookie.
-- Release artifacts are unsigned unless a signing identity is configured externally.
+- Release artifacts are ad-hoc signed but not notarized unless a signing identity is configured externally.
 
 ## Original Project
 
