@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.3.1 - Multi-Instance Cleanup
+
+- Reworked multi-instance copies to be temporary per-launch app copies.
+- Added automatic cleanup after the launched Roblox instance exits.
+- Added a Settings button to clean leftover multi-instance copies manually.
+- Documented cleanup behavior and manual cleanup steps.
+
 ## v0.3.0 - Experimental Multi-Instance
 
 - Added experimental native macOS multi-instance launch support.

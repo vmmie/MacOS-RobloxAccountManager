@@ -8,7 +8,7 @@ This project is not affiliated with Roblox Corporation.
 
 ## Current Status
 
-`v0.3.0` adds experimental native macOS multi-instance launching while keeping the app focused on local account management and a guarded Roblox launch flow.
+`v0.3.1` adds cleanup for temporary multi-instance Roblox app copies while keeping the app focused on local account management and a guarded Roblox launch flow.
 
 ## Upstream Analysis Summary
 
@@ -67,7 +67,7 @@ Not included:
 - No bundled Windows executables or DLLs.
 - No plaintext account secret export.
 - No account-control websocket server.
-- No Developer API server in `v0.3.0`.
+- No Developer API server in `v0.3.1`.
 
 Only use this tool with accounts you own. Never share tokens, exported files containing secrets, or generated launch links.
 
@@ -106,9 +106,9 @@ The project [Insadem/multi-roblox-macos](https://github.com/Insadem/multi-roblox
 
 ## Installation
 
-Download the `v0.3.0` release asset, unzip it, and run `MacOS-RobloxAccountManager.app`. The release zip contains a universal `arm64` + `x86_64` app bundle.
+Download the `v0.3.1` release asset, unzip it, and run `MacOS-RobloxAccountManager.app`. The release zip contains a universal `arm64` + `x86_64` app bundle.
 
-If macOS blocks the app, build from source or explicitly allow the app in System Settings. `v0.3.0` release builds are ad-hoc signed but not notarized with an Apple Developer ID.
+If macOS blocks the app, build from source or explicitly allow the app in System Settings. `v0.3.1` release builds are ad-hoc signed but not notarized with an Apple Developer ID.
 
 ## Build Instructions
 
