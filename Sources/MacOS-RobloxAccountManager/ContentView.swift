@@ -144,7 +144,7 @@ struct AccountDetailView: View {
             }
             .buttonStyle(.borderedProminent)
             .disabled(!store.settings.allowAccountLaunch || !store.settings.allowRbxPlayerLinks || account.savedPlaceID.isEmpty)
-            .help("Uses Roblox's rbx-player URL handler. Disabled by default because launch links are risky.")
+            .help("Uses Roblox's roblox-player URL handler.")
 
             Button {
                 store.editSelectedAccount()
@@ -163,11 +163,10 @@ struct AccountDetailView: View {
     private func details(_ account: AccountRecord) -> some View {
         Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 10) {
             detailRow("Group", account.group)
-            detailRow("User ID", account.userID.map(String.init) ?? "Not set")
-            detailRow("Saved Place ID", account.savedPlaceID.isEmpty ? "Not set" : account.savedPlaceID)
+            detailRow("Saved Game ID / Place ID", account.savedPlaceID.isEmpty ? "Not set" : account.savedPlaceID)
             detailRow("Saved Job ID", account.savedJobID.isEmpty ? "Not set" : account.savedJobID)
             detailRow("Last Used", account.lastUsedAt?.formatted(date: .abbreviated, time: .shortened) ?? "Never")
-            detailRow("Stored Data", "Metadata in Application Support, secrets in macOS Keychain")
+            detailRow("Stored Data", "Metadata in Application Support, tokens in macOS Keychain")
         }
         .padding(16)
         .background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: 8))
@@ -222,4 +221,3 @@ struct StatusBar: View {
         .background(.bar)
     }
 }
-

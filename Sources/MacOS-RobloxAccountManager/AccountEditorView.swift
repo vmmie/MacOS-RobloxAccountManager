@@ -22,12 +22,10 @@ struct AccountEditorView: View {
 
             Form {
                 TextField("Username", text: $record.username)
-                TextField("Alias", text: $record.alias)
                 TextField("Group", text: $record.group)
-                TextField("User ID", value: $record.userID, format: .number)
-                TextField("Saved Place ID", text: $record.savedPlaceID)
+                TextField("Saved Game ID / Place ID", text: $record.savedPlaceID)
                 TextField("Saved Job ID / VIP code", text: $record.savedJobID)
-                SecureField(".ROBLOSECURITY cookie", text: $cookie)
+                SecureField(".ROBLOSECURITY token", text: $cookie)
                 if store.settings.savePasswords {
                     SecureField("Optional password", text: $password)
                 }
@@ -35,7 +33,7 @@ struct AccountEditorView: View {
                     .lineLimit(3...6)
             }
 
-            Text("Secrets are stored in the macOS Keychain. Export and backup actions do not include cookies or passwords.")
+            Text("Secrets are stored in the macOS Keychain. Export and backup actions do not include tokens or passwords.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
@@ -57,4 +55,3 @@ struct AccountEditorView: View {
         .frame(width: 560)
     }
 }
-

@@ -11,9 +11,9 @@ public enum RobloxLaunchError: LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .launchDisabled:
-            "Account launching is disabled in Settings. Enable it only if you understand the rbx-player risk."
+            "Account launching is disabled in Settings."
         case .emptyCookie:
-            "This account does not have a stored .ROBLOSECURITY cookie."
+            "This account does not have a stored .ROBLOSECURITY token."
         case .invalidPlaceID:
             "Enter a numeric Roblox Place ID before launching."
         case let .csrfTokenMissing(response):

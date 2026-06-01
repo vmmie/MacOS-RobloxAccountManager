@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.0 - Launch Flow Cleanup
+
+- Removed `Alias` and `User ID` fields from the macOS app.
+- Reworded the account secret field to `.ROBLOSECURITY` token.
+- Moved `Allow account launching` and `Allow roblox-player launch URLs` into normal launch settings.
+- Added a usage guide to the README that explains the saved game/place ID and token flow.
+- Bumped bundle metadata and release packaging to `0.2.0`.
+
 ## v0.1.0 - Initial macOS Port
 
 - Added native SwiftUI macOS account manager UI.

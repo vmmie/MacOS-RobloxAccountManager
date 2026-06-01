@@ -1,6 +1,6 @@
 # MacOS-RobloxAccountManager
 
-MacOS-RobloxAccountManager is a native macOS port of [Roblox Account Manager](https://github.com/ic3w0lf22/Roblox-Account-Manager). The goal is to preserve the original application's core workflow on macOS: keep a local list of accounts, search them, edit metadata, securely store local secrets, and launch Roblox for a selected account where macOS and Roblox allow it.
+MacOS-RobloxAccountManager is a native macOS port of [Roblox Account Manager](https://github.com/ic3w0lf22/Roblox-Account-Manager). It keeps the same core workflow on macOS: store local account data, search and manage accounts, and launch Roblox for a selected account when macOS and Roblox allow it.
 
 This is a GPL-3.0 project. The upstream Roblox Account Manager project is GPL-3.0, and this port keeps the same license. See [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).
 
@@ -8,7 +8,7 @@ This project is not affiliated with Roblox Corporation.
 
 ## Current Status
 
-v0.1.0 is a functional, conservative macOS port. It intentionally does not copy Windows-only binaries or unsafe account-control features. Risky features are disabled by default and must be manually enabled.
+`v0.2.0` is the first usable macOS release line. It keeps the app focused on local account management and a guarded Roblox launch flow.
 
 ## Upstream Analysis Summary
 
@@ -17,26 +17,35 @@ The original Windows project is a WinForms/.NET Framework application. Important
 - UI: WinForms main account list, account context menu, settings form, server list, utilities, account control, theme editor.
 - Storage: `AccountData.json`, `RecentGames.json`, `RAMSettings.ini`, `RAMTheme.ini`.
 - Encryption: Windows DPAPI by default, optional password encryption through libsodium, and a risky plaintext escape hatch.
-- Accounts: `.ROBLOSECURITY` cookie, username, alias, description, group, user ID, fields, password, last use, browser tracker ID.
+- Accounts: `.ROBLOSECURITY` token, username, description, group, saved game/place ID, saved job ID, password, last use, browser tracker ID.
 - Launching: Roblox authentication ticket request followed by a `roblox-player:` launch URL or Windows executable launch.
 - Multi-instance: Windows named mutex behavior around `ROBLOX_singletonMutex`.
 - Developer API: optional local HTTP API with methods such as account listing, cookie retrieval, account launch, and account editing.
 - Account Control/Nexus: websocket control path plus Lua helper scripts.
 - Windows-only parts: registry checks, `.exe`/`.dll` resources, `handle.exe`, DWM/window positioning, process command-line inspection, embedded updater, CefSharp/Puppeteer browser helpers.
 
+## How To Use It
+
+1. Add an account.
+2. Paste your own `.ROBLOSECURITY` token into the account form. Use a browser where you are already signed in to Roblox on your own account, then copy the token value from the site cookies.
+3. Enter the Roblox game or place number into `Saved Game ID / Place ID`. Game ID is the saved place ID. Open the game page in your browser and copy the number from the address bar.
+4. Optionally enter a saved job ID or VIP/private-server code.
+5. Open Settings and enable `Allow account launching` and `Allow roblox-player launch URLs`.
+6. Select the account and launch it.
+
 ## Implemented Features
 
 - Native SwiftUI macOS app.
 - Account list with search/filter.
 - Add, edit, and delete account records.
-- Account metadata fields: username, alias, description, group, user ID, saved Place ID, saved Job ID/VIP code, last-used timestamp.
+- Account metadata fields: username, description, group, saved game/place ID, saved job ID/VIP code, last-used timestamp.
 - Secure local secret storage using macOS Keychain.
 - Optional password storage in Keychain, disabled by default.
 - Metadata import/export as JSON.
 - Metadata backup to Application Support.
-- Settings view with clear risky-feature toggles.
+- Settings view with normal launch toggles and advanced toggles separated out.
 - Logs with visible error messages.
-- Guarded Roblox launch support using Roblox authentication ticket flow and `roblox-player:` URL handler.
+- Roblox launch support using Roblox authentication ticket flow and `roblox-player:` URL handler.
 - Tests for storage, import/export, and launch URL construction.
 - GitHub Actions workflow for Swift build/test.
 
@@ -47,7 +56,7 @@ Stored locally:
 - `~/Library/Application Support/MacOS-RobloxAccountManager/Accounts.json`
 - `~/Library/Application Support/MacOS-RobloxAccountManager/Settings.json`
 - `~/Library/Application Support/MacOS-RobloxAccountManager/Logs.txt`
-- macOS Keychain items for `.ROBLOSECURITY` cookies and optional passwords
+- macOS Keychain items for `.ROBLOSECURITY` tokens and optional passwords
 
 Not included:
 
@@ -57,23 +66,21 @@ Not included:
 - No bundled Windows executables or DLLs.
 - No plaintext account secret export.
 - No account-control websocket server.
-- No Developer API server in v0.1.0.
+- No Developer API server in `v0.2.0`.
 
-Only use this tool with accounts you own. Never share `.ROBLOSECURITY` cookies, exported files containing secrets, or generated launch links.
+Only use this tool with accounts you own. Never share tokens, exported files containing secrets, or generated launch links.
 
-## Risk Warnings
+## Launching
 
-`rbx-player` launch links are risky. A launch link or authentication ticket can allow someone else to use a Roblox session if shared. For that reason, account launching and `rbx-player` URL launching are both disabled by default.
+The `Allow account launching` and `Allow roblox-player launch URLs` options are normal launch settings. They are disabled by default because launch links depend on Roblox session state, but they are not hidden behind a special risk mode.
 
-Multi-instance behavior is also risky and was disabled by default upstream. The Windows implementation depends on a Windows named mutex. This macOS port does not implement a bypass or unsupported replacement in v0.1.0.
-
-Developer/API functionality is disabled and not implemented in v0.1.0. The upstream API can expose sensitive operations, including cookie retrieval and launching accounts, so it needs a separate hardened design before being enabled on macOS.
+The app launches Roblox by requesting an authentication ticket for the selected account, building a `roblox-player:` URL, and handing it off to macOS.
 
 ## Installation
 
-Download the v0.1.0 release asset if available, unzip it, and run `MacOS-RobloxAccountManager.app`. The release zip contains a universal `arm64` + `x86_64` app bundle.
+Download the `v0.2.0` release asset, unzip it, and run `MacOS-RobloxAccountManager.app`. The release zip contains a universal `arm64` + `x86_64` app bundle.
 
-If macOS blocks the app, build from source or explicitly allow the app in System Settings. v0.1.0 release builds are ad-hoc signed but not notarized with an Apple Developer ID.
+If macOS blocks the app, build from source or explicitly allow the app in System Settings. `v0.2.0` release builds are ad-hoc signed but not notarized with an Apple Developer ID.
 
 ## Build Instructions
 
@@ -114,9 +121,9 @@ The bundle is written to `dist/MacOS-RobloxAccountManager.app`.
 - No Developer API server yet.
 - No account-control websocket/Nexus port.
 - No server browser, universe/outfit utilities, account utilities, Roblox watcher, browser automation, or FPS unlocker.
-- No macOS multi-instance implementation in v0.1.0.
-- Import/export intentionally excludes cookies and passwords.
-- Roblox launch depends on the installed Roblox macOS URL handler and a valid account cookie.
+- No macOS multi-instance implementation in `v0.2.0`.
+- Import/export intentionally excludes tokens and passwords.
+- Roblox launch depends on the installed Roblox macOS URL handler and a valid account token.
 - Release artifacts are ad-hoc signed but not notarized unless a signing identity is configured externally.
 
 ## Original Project

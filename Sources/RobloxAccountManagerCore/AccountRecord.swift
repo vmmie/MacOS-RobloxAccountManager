@@ -3,10 +3,8 @@ import Foundation
 public struct AccountRecord: Codable, Identifiable, Equatable, Sendable {
     public var id: UUID
     public var username: String
-    public var alias: String
     public var description: String
     public var group: String
-    public var userID: Int64?
     public var savedPlaceID: String
     public var savedJobID: String
     public var lastUsedAt: Date?
@@ -16,10 +14,8 @@ public struct AccountRecord: Codable, Identifiable, Equatable, Sendable {
     public init(
         id: UUID = UUID(),
         username: String,
-        alias: String = "",
         description: String = "",
         group: String = "Default",
-        userID: Int64? = nil,
         savedPlaceID: String = "",
         savedJobID: String = "",
         lastUsedAt: Date? = nil,
@@ -28,10 +24,8 @@ public struct AccountRecord: Codable, Identifiable, Equatable, Sendable {
     ) {
         self.id = id
         self.username = username.trimmingCharacters(in: .whitespacesAndNewlines)
-        self.alias = alias
         self.description = description
         self.group = group.isEmpty ? "Default" : group
-        self.userID = userID
         self.savedPlaceID = savedPlaceID
         self.savedJobID = savedJobID
         self.lastUsedAt = lastUsedAt
@@ -40,7 +34,7 @@ public struct AccountRecord: Codable, Identifiable, Equatable, Sendable {
     }
 
     public var displayName: String {
-        alias.isEmpty ? username : alias
+        username
     }
 }
 
@@ -53,4 +47,3 @@ public struct AccountSecret: Codable, Equatable, Sendable {
         self.password = password?.isEmpty == true ? nil : password
     }
 }
-

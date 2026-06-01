@@ -40,7 +40,6 @@ final class AppStore: ObservableObject {
         guard !needle.isEmpty else { return accounts.sorted(by: accountSort) }
         return accounts.filter {
             $0.username.lowercased().contains(needle)
-                || $0.alias.lowercased().contains(needle)
                 || $0.group.lowercased().contains(needle)
                 || $0.description.lowercased().contains(needle)
         }
@@ -71,7 +70,7 @@ final class AppStore: ObservableObject {
                 throw ValidationError("Username is required.")
             }
             guard !secret.robloxSecurityCookie.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                throw ValidationError(".ROBLOSECURITY cookie is required.")
+                throw ValidationError(".ROBLOSECURITY token is required.")
             }
 
             var updated = record
