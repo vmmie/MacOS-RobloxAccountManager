@@ -81,7 +81,7 @@ Requirements:
 
 - macOS 14 or newer
 - Xcode command line tools
-- Swift 6.2 or compatible current Swift toolchain
+- Swift 6.1 or compatible current Swift toolchain
 
 Build:
 
@@ -126,4 +126,3 @@ Original project: https://github.com/ic3w0lf22/Roblox-Account-Manager
 Original license: GNU General Public License v3.0
 
 This macOS port preserves the license and clearly marks the changed platform behavior.
-
