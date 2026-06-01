@@ -1,0 +1,16 @@
+.DS_Store
+.build/
+.swiftpm/
+DerivedData/
+*.xcodeproj
+*.xcworkspace
+*.xcuserstate
+*.dSYM
+*.app
+*.dmg
+*.zip
+Logs.txt
+Accounts.json
+Settings.json
+*.backup.json
+
