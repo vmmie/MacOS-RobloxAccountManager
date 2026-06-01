@@ -81,6 +81,9 @@ public struct RobloxLaunchService: Sendable {
         request.addValue(".ROBLOSECURITY=\(trimmedCookie)", forHTTPHeaderField: "Cookie")
         request.addValue(csrf, forHTTPHeaderField: "X-CSRF-TOKEN")
         request.addValue("https://www.roblox.com/games/4924922222/Brookhaven-RP", forHTTPHeaderField: "Referer")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = Data("{}".utf8)
 
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse,
@@ -112,4 +115,3 @@ public struct RobloxLaunchService: Sendable {
         return token
     }
 }
-
