@@ -8,7 +8,7 @@ This project is not affiliated with Roblox Corporation.
 
 ## Current Status
 
-`v0.3.1` adds cleanup for temporary multi-instance Roblox app copies while keeping the app focused on local account management and a guarded Roblox launch flow.
+`v0.4.0` adds a packaged DMG installer, app icon, and global launch target settings while keeping the app focused on local account management and a guarded Roblox launch flow.
 
 ## Upstream Analysis Summary
 
@@ -28,17 +28,18 @@ The original Windows project is a WinForms/.NET Framework application. Important
 
 1. Add an account.
 2. Paste your own `.ROBLOSECURITY` token into the account form. Use a browser where you are already signed in to Roblox on your own account, then copy the token value from the site cookies.
-3. Enter the Roblox game or place number into `Saved Game ID / Place ID`. Game ID is the saved place ID. Open the game page in your browser and copy the number from the address bar.
-4. Optionally enter a saved job ID or VIP/private-server code.
+3. Select any account and enter the Roblox game or place number into `Game ID / Place ID` above the `Launch Roblox` button. Game ID is the saved place ID. Open the game page in your browser and copy the number from the address bar.
+4. Optionally enter a Job ID or VIP/private-server code above the launch button.
 5. Open Settings and enable `Allow account launching` and `Allow roblox-player launch URLs`.
-6. Select the account and launch it.
+6. Select the account you want to use and launch it.
 
 ## Implemented Features
 
 - Native SwiftUI macOS app.
 - Account list with search/filter.
 - Add, edit, and delete account records.
-- Account metadata fields: username, description, group, saved game/place ID, saved job ID/VIP code, last-used timestamp.
+- Account metadata fields: username, description, group, and last-used timestamp.
+- Global launch target settings for Game ID / Place ID and optional Job ID / VIP code.
 - Secure local secret storage using macOS Keychain.
 - Optional password storage in Keychain, disabled by default.
 - Metadata import/export as JSON.
@@ -48,7 +49,7 @@ The original Windows project is a WinForms/.NET Framework application. Important
 - Roblox launch support using Roblox authentication ticket flow and `roblox-player:` URL handler.
 - Experimental native macOS multi-instance launching through managed Roblox app copies.
 - Tests for storage, import/export, and launch URL construction.
-- GitHub Actions workflow for Swift build/test.
+- Local build/test workflow through SwiftPM.
 
 ## Security Model
 
@@ -67,7 +68,7 @@ Not included:
 - No bundled Windows executables or DLLs.
 - No plaintext account secret export.
 - No account-control websocket server.
-- No Developer API server in `v0.3.1`.
+- No Developer API server in `v0.4.0`.
 
 Only use this tool with accounts you own. Never share tokens, exported files containing secrets, or generated launch links.
 
@@ -76,6 +77,8 @@ Only use this tool with accounts you own. Never share tokens, exported files con
 The `Allow account launching` and `Allow roblox-player launch URLs` options are normal launch settings. They are disabled by default because launch links depend on Roblox session state, but they are not hidden behind a special risk mode.
 
 The app launches Roblox by requesting an authentication ticket for the selected account, building a `roblox-player:` URL, and handing it off to macOS.
+
+The Game ID / Place ID and optional Job ID / VIP code are universal launch settings shown above the `Launch Roblox` button. They are not saved per account. Select any account, and the app launches that account into the shared target.
 
 ## Multi-Instance
 
@@ -106,9 +109,9 @@ The project [Insadem/multi-roblox-macos](https://github.com/Insadem/multi-roblox
 
 ## Installation
 
-Download the `v0.3.1` release asset, unzip it, and run `MacOS-RobloxAccountManager.app`. The release zip contains a universal `arm64` + `x86_64` app bundle.
+Download the `v0.4.0` DMG release asset, open it, and drag `MacOS-RobloxAccountManager.app` into Applications. The DMG uses a compact Finder install window with an Applications shortcut. The release also includes a zip fallback with the same universal `arm64` + `x86_64` app bundle.
 
-If macOS blocks the app, build from source or explicitly allow the app in System Settings. `v0.3.1` release builds are ad-hoc signed but not notarized with an Apple Developer ID.
+If macOS blocks the app, build from source or explicitly allow the app in System Settings. `v0.4.0` release builds are ad-hoc signed but not notarized with an Apple Developer ID.
 
 ## Build Instructions
 
@@ -136,13 +139,13 @@ Test:
 swift test
 ```
 
-Create a local `.app` bundle:
+Create a local `.app`, `.zip`, and `.dmg` bundle:
 
 ```sh
 Scripts/package_app.sh
 ```
 
-The bundle is written to `dist/MacOS-RobloxAccountManager.app`.
+The bundle is written to `dist/MacOS-RobloxAccountManager.app`. The DMG is written to `dist/MacOS-RobloxAccountManager-v0.4.0-macos.dmg`.
 
 ## Known Limitations
 
@@ -171,5 +174,7 @@ The bundle is written to `dist/MacOS-RobloxAccountManager.app`.
 Original project: https://github.com/ic3w0lf22/Roblox-Account-Manager
 
 Original license: GNU General Public License v3.0
+
+Icon asset source: https://github.com/ic3w0lf22/Roblox-Account-Manager
 
 This macOS port preserves the license and clearly marks the changed platform behavior.

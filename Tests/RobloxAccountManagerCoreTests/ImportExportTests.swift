@@ -4,7 +4,7 @@ import XCTest
 
 final class ImportExportTests: XCTestCase {
     func testMetadataExportDoesNotIncludeSecrets() throws {
-        let account = AccountRecord(username: "exampleUser", group: "Primary", savedPlaceID: "1818")
+        let account = AccountRecord(username: "exampleUser", group: "Primary")
         let envelope = ImportExportService().makeExport(accounts: [account])
 
         XCTAssertFalse(envelope.includesSensitiveSecrets)
@@ -39,7 +39,13 @@ final class ImportExportTests: XCTestCase {
 
         let storage = try FileStorage(rootDirectory: root)
         let accounts = [AccountRecord(username: "one"), AccountRecord(username: "two", group: "Alts")]
-        let settings = AppSettings(allowAccountLaunch: true, allowRbxPlayerLinks: true, savePasswords: true)
+        let settings = AppSettings(
+            allowAccountLaunch: true,
+            allowRbxPlayerLinks: true,
+            savePasswords: true,
+            savedPlaceID: "1818",
+            savedJobID: "job"
+        )
 
         try storage.saveAccounts(accounts)
         try storage.saveSettings(settings)
@@ -52,6 +58,28 @@ final class ImportExportTests: XCTestCase {
 
         let backupURL = try storage.backupAccounts()
         XCTAssertTrue(FileManager.default.fileExists(atPath: backupURL.path))
+    }
+
+    func testSettingsDecodeOlderFilesWithoutGlobalLaunchTarget() throws {
+        let json = """
+        {
+          "allowAccountLaunch" : true,
+          "allowDeveloperAPI" : false,
+          "allowMultiInstance" : true,
+          "allowRbxPlayerLinks" : true,
+          "developerAPIPort" : 7963,
+          "launchDelaySeconds" : 8,
+          "savePasswords" : false
+        }
+        """
+
+        let settings = try JSONCoding.decoder.decode(AppSettings.self, from: Data(json.utf8))
+
+        XCTAssertTrue(settings.allowAccountLaunch)
+        XCTAssertTrue(settings.allowRbxPlayerLinks)
+        XCTAssertTrue(settings.allowMultiInstance)
+        XCTAssertEqual(settings.savedPlaceID, "")
+        XCTAssertEqual(settings.savedJobID, "")
     }
 
     func testLaunchURLMatchesRobloxSchemeShape() throws {

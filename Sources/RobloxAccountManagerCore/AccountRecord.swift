@@ -5,8 +5,6 @@ public struct AccountRecord: Codable, Identifiable, Equatable, Sendable {
     public var username: String
     public var description: String
     public var group: String
-    public var savedPlaceID: String
-    public var savedJobID: String
     public var lastUsedAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
@@ -16,8 +14,6 @@ public struct AccountRecord: Codable, Identifiable, Equatable, Sendable {
         username: String,
         description: String = "",
         group: String = "Default",
-        savedPlaceID: String = "",
-        savedJobID: String = "",
         lastUsedAt: Date? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
@@ -26,8 +22,6 @@ public struct AccountRecord: Codable, Identifiable, Equatable, Sendable {
         self.username = username.trimmingCharacters(in: .whitespacesAndNewlines)
         self.description = description
         self.group = group.isEmpty ? "Default" : group
-        self.savedPlaceID = savedPlaceID
-        self.savedJobID = savedJobID
         self.lastUsedAt = lastUsedAt
         self.createdAt = createdAt
         self.updatedAt = updatedAt

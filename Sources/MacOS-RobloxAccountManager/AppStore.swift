@@ -117,6 +117,14 @@ final class AppStore: ObservableObject {
         }
     }
 
+    func persistSettings() {
+        do {
+            try storage.saveSettings(settings)
+        } catch {
+            report(error)
+        }
+    }
+
     func backupAccounts() {
         do {
             let url = try storage.backupAccounts()
@@ -177,7 +185,7 @@ final class AppStore: ObservableObject {
             return
         }
         guard let account = selectedAccount else { return }
-        let request = RobloxLaunchRequest(placeID: account.savedPlaceID, jobID: account.savedJobID)
+        let request = RobloxLaunchRequest(placeID: settings.savedPlaceID, jobID: settings.savedJobID)
 
         Task {
             do {

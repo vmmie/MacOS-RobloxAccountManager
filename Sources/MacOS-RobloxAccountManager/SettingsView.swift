@@ -15,6 +15,9 @@ struct SettingsView: View {
                     Stepper("Launch delay: \(store.settings.launchDelaySeconds) seconds", value: $store.settings.launchDelaySeconds, in: 0...60)
                     Toggle("Allow account launching", isOn: $store.settings.allowAccountLaunch)
                     Toggle("Allow roblox-player launch URLs", isOn: $store.settings.allowRbxPlayerLinks)
+                    Text("Set the universal Game ID / Place ID and optional Job ID above the Launch Roblox button in the account detail view.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section("Advanced") {

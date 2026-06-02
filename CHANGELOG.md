@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.4.0 - Local Test Build
+
+- Added a macOS app icon based on the original GPL-3.0 Windows icon asset from ic3w0lf22/Roblox-Account-Manager.
+- Added DMG packaging with an Applications shortcut for easier installation.
+- Added a polished DMG Finder layout with a compact window and drag-to-Applications arrow background.
+- Moved Game ID / Place ID and Job ID / VIP code from per-account fields to global Settings launch fields.
+- Moved the global launch target fields into the account detail view directly above the Launch Roblox button.
+- Updated launch behavior so every selected account uses the shared launch target.
+- Removed GitHub Actions workflow so repository pushes do not consume CI minutes.
+
 ## v0.3.1 - Multi-Instance Cleanup
 
 - Reworked multi-instance copies to be temporary per-launch app copies.

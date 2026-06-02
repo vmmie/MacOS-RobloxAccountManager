@@ -14,3 +14,10 @@ The upstream Windows project uses WinForms, .NET Framework, DPAPI, libsodium, Wi
 
 Windows-only binaries, DLLs, registry checks, process-window manipulation, auto-updater logic, browser automation, account-control websockets, and unsafe or unimplemented network APIs were not copied into this repository.
 
+## Icon Attribution
+
+The macOS app icon is based on the `RBX Alt Manager/Resources/team_KX4_icon.ico` icon asset from the original GPL-3.0 upstream project:
+
+https://github.com/ic3w0lf22/Roblox-Account-Manager
+
+The icon asset is included under the same GPL-3.0 terms as the upstream project and this macOS port.

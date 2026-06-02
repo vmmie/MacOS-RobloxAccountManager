@@ -23,8 +23,6 @@ struct AccountEditorView: View {
             Form {
                 TextField("Username", text: $record.username)
                 TextField("Group", text: $record.group)
-                TextField("Saved Game ID / Place ID", text: $record.savedPlaceID)
-                TextField("Saved Job ID / VIP code", text: $record.savedJobID)
                 SecureField(".ROBLOSECURITY token", text: $cookie)
                 if store.settings.savePasswords {
                     SecureField("Optional password", text: $password)

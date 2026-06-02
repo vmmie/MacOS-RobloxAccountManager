@@ -106,6 +106,7 @@ struct AccountDetailView: View {
             if let account {
                 VStack(alignment: .leading, spacing: 20) {
                     header(account)
+                    launchTargetEditor
                     actionRow(account)
                     details(account)
                     logPanel
@@ -135,6 +136,46 @@ struct AccountDetailView: View {
         }
     }
 
+    private var launchTargetEditor: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Launch Target")
+                .font(.headline)
+
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
+                GridRow {
+                    Text("Game ID / Place ID")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                    TextField("Required", text: $store.settings.savedPlaceID)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                GridRow {
+                    Text("Job ID / VIP code")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                    TextField("Optional", text: $store.settings.savedJobID)
+                        .textFieldStyle(.roundedBorder)
+                }
+            }
+
+            Text("This launch target is shared by every account. Select any account, then launch it into this place.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(16)
+        .background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: 8))
+        .onSubmit {
+            store.persistSettings()
+        }
+        .onChange(of: store.settings.savedPlaceID) {
+            store.persistSettings()
+        }
+        .onChange(of: store.settings.savedJobID) {
+            store.persistSettings()
+        }
+    }
+
     private func actionRow(_ account: AccountRecord) -> some View {
         HStack(spacing: 10) {
             Button {
@@ -143,7 +184,7 @@ struct AccountDetailView: View {
                 Label("Launch Roblox", systemImage: "play.fill")
             }
             .buttonStyle(.borderedProminent)
-            .disabled(!store.settings.allowAccountLaunch || !store.settings.allowRbxPlayerLinks || account.savedPlaceID.isEmpty)
+            .disabled(!store.settings.allowAccountLaunch || !store.settings.allowRbxPlayerLinks || store.settings.savedPlaceID.isEmpty)
             .help("Uses Roblox's roblox-player URL handler.")
 
             Button {
@@ -163,8 +204,6 @@ struct AccountDetailView: View {
     private func details(_ account: AccountRecord) -> some View {
         Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 10) {
             detailRow("Group", account.group)
-            detailRow("Saved Game ID / Place ID", account.savedPlaceID.isEmpty ? "Not set" : account.savedPlaceID)
-            detailRow("Saved Job ID", account.savedJobID.isEmpty ? "Not set" : account.savedJobID)
             detailRow("Last Used", account.lastUsedAt?.formatted(date: .abbreviated, time: .shortened) ?? "Never")
             detailRow("Stored Data", "Metadata in Application Support, tokens in macOS Keychain")
         }
